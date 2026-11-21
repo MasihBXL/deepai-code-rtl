@@ -1,6 +1,6 @@
 /**
  * DeepAI Code Persian & RTL Enhancer Engine
- * Targeted: Enhances chat message readability and Persian typography
+ * Precision targeted: Formats chat conversation text and center-aligns hero heading,
  * while strictly leaving the UI layout, sidebar, tabs, and navigation intact.
  */
 (function initDeepAIRTL() {
@@ -19,11 +19,50 @@
     return RTL_REGEX.test(trimmed);
   }
 
-  // Process ONLY elements inside the chat conversation
+  // Ensure "What should we work on?" hero title is center-aligned
+  function centerHeroTitle() {
+    const headings = document.querySelectorAll('h1');
+    for (let i = 0; i < headings.length; i++) {
+      const h = headings[i];
+      const text = h.textContent || '';
+      if (text.includes('What should we') || text.includes('Choose a project') || text.includes('Add a project')) {
+        h.style.setProperty('text-align', 'center', 'important');
+        h.style.setProperty('width', '100%', 'important');
+        h.style.setProperty('margin-left', 'auto', 'important');
+        h.style.setProperty('margin-right', 'auto', 'important');
+        if (h.parentElement) {
+          h.parentElement.style.setProperty('text-align', 'center', 'important');
+          h.parentElement.style.setProperty('align-items', 'center', 'important');
+          h.parentElement.style.setProperty('justify-content', 'center', 'important');
+        }
+      }
+    }
+  }
+
+  // Fix neutral punctuation (periods, question marks, exclamation marks) attached to English words inside Persian text
+  function fixBidiPunctuation(el) {
+    if (!el || el.__bidiFixed) return;
+    el.__bidiFixed = true;
+
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
+    let textNode;
+    while ((textNode = walker.nextNode())) {
+      const val = textNode.nodeValue;
+      if (!val) continue;
+
+      // When an English sentence ends with a period/exclamation mark before Persian text:
+      // Append an invisible Left-to-Right Mark (\u200E) so the period stays with the English sentence
+      if (/[a-zA-Z0-9][.!?][\s\n]+[\u0600-\u06FF]/.test(val)) {
+        textNode.nodeValue = val.replace(/([a-zA-Z0-9][.!?])([\s\n]+[\u0600-\u06FF])/g, '$1\u200E$2');
+      }
+    }
+  }
+
+  // Process text elements
   function processElement(el) {
     if (!el || el.nodeType !== Node.ELEMENT_NODE) return;
 
-    // Strictly skip sidebar, navigation, tabs, titlebar, modals, menus
+    // Strictly skip sidebar, navigation, tabs, titlebars, and menus
     if (
       el.closest('aside') ||
       el.closest('nav') ||
@@ -35,12 +74,14 @@
       el.closest('[class*="header"]') ||
       el.closest('[class*="Header"]') ||
       el.closest('[class*="titlebar"]') ||
-      el.closest('[class*="project"]')
+      el.closest('[class*="Titlebar"]') ||
+      el.closest('[class*="project"]') ||
+      el.closest('button')
     ) {
       return;
     }
 
-    // Skip code blocks, pre tags, and terminals
+    // Skip code blocks, pre tags, diffs, terminals, tables
     const tag = el.tagName.toLowerCase();
     if (
       tag === 'pre' ||
@@ -60,12 +101,13 @@
       return;
     }
 
-    // Only process text elements inside chat messages (.chat-markdown or message rows)
-    const isInsideChat = el.closest('.chat-markdown') || el.closest('.chat-content-lane') || el.closest('.messages-timeline-row-frame');
-    if (!isInsideChat) return;
-
     const isTextTag = ['p', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote'].includes(tag);
     if (!isTextTag) return;
+
+    // Don't format the hero title as RTL
+    if (tag === 'h1' && (el.textContent || '').includes('What should we')) {
+      return;
+    }
 
     const text = el.innerText || el.textContent || '';
     if (!text || text.trim().length === 0) return;
@@ -73,33 +115,31 @@
     if (isRTLText(text)) {
       if (el.getAttribute('dir') !== 'rtl') {
         el.setAttribute('dir', 'rtl');
-        el.classList.add('deepai-persian-block');
+        el.classList.add('deepai-persian-text');
+        fixBidiPunctuation(el);
       }
     } else {
       if (el.getAttribute('dir') === 'rtl') {
         el.removeAttribute('dir');
-        el.classList.remove('deepai-persian-block');
+        el.classList.remove('deepai-persian-text');
       }
     }
   }
 
   function scanNode(root) {
     if (!isEnabled || !root) return;
-    if (root.nodeType !== Node.ELEMENT_NODE) return;
+    centerHeroTitle();
 
-    const chatContainers = root.matches && (root.matches('.chat-markdown, .chat-content-lane, .messages-timeline-row-frame'))
-      ? [root]
-      : (root.querySelectorAll ? root.querySelectorAll('.chat-markdown, .chat-content-lane, .messages-timeline-row-frame') : []);
-
-    for (let c = 0; c < chatContainers.length; c++) {
-      const items = chatContainers[c].querySelectorAll('p, li, h1, h2, h3, h4, h5, h6, blockquote');
+    if (root.nodeType === Node.ELEMENT_NODE) {
+      processElement(root);
+      const items = root.querySelectorAll('p, li, h1, h2, h3, h4, h5, h6, blockquote');
       for (let i = 0; i < items.length; i++) {
         processElement(items[i]);
       }
     }
   }
 
-  // MutationObserver with debounce for real-time AI streaming
+  // MutationObserver for real-time streaming AI responses
   let scheduled = false;
   const nodesToProcess = new Set();
 
@@ -113,6 +153,7 @@
       scanNode(node);
     });
     nodesToProcess.clear();
+    centerHeroTitle();
   }
 
   const observer = new MutationObserver((mutations) => {
@@ -191,8 +232,8 @@
     if (isEnabled) {
       scanNode(document.body);
     } else {
-      document.querySelectorAll('.deepai-persian-block').forEach((el) => {
-        el.classList.remove('deepai-persian-block');
+      document.querySelectorAll('.deepai-persian-text').forEach((el) => {
+        el.classList.remove('deepai-persian-text');
         el.removeAttribute('dir');
       });
     }
@@ -210,6 +251,7 @@
 
   function boot() {
     createWidget();
+    centerHeroTitle();
     if (document.body) {
       scanNode(document.body);
       observer.observe(document.body, {

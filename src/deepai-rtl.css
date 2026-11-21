@@ -1,4 +1,4 @@
-/* DeepAI Code Persian & RTL Support Styles - Targeted & Non-Intrusive */
+/* DeepAI Code Persian & RTL Support Styles */
 @import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css');
 
 :root {
@@ -6,13 +6,28 @@
   --deepai-mono-font: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
-/* Apply Vazirmatn font for beautiful Persian typography without changing layout */
-body, input, textarea, button {
-  font-family: var(--deepai-rtl-font);
+/* ==========================================================================
+   CENTER HERO HEADING ("What should we work on?")
+   ========================================================================== */
+h1[aria-label*="What should we"],
+div:has(> h1[aria-label*="What should we"]),
+div.mx-auto.flex.w-full.max-w-5xl,
+div.mx-auto.flex.w-full.max-w-5xl > h1,
+div.mx-auto.flex.w-full.max-w-5xl > p {
+  text-align: center !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+div.mx-auto.flex.w-full.max-w-5xl > h1 {
+  width: 100% !important;
+  display: block !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
 }
 
 /* ==========================================================================
-   STRICT PROTECTION: Sidebar, Tabs, Titlebar, and UI Layout MUST REMAIN LTR
+   STRICT PROTECTION: Keep Sidebar, Tabs, Titlebar strictly LTR and Left-Aligned
    ========================================================================== */
 aside,
 nav,
@@ -21,21 +36,14 @@ nav,
 [class*="WorkspaceTabs"],
 [class*="tabs"],
 [class*="Tabs"],
-[class*="header"],
-[class*="Header"],
 [class*="titlebar"],
 [class*="Titlebar"],
-[class*="project"],
-[class*="Project"],
-[class*="dialog"],
-[class*="Dialog"],
 [class*="menu"],
 [class*="Menu"] {
   direction: ltr !important;
   text-align: left !important;
 }
 
-/* Sidebar chat titles and list items: always stay left-aligned next to their icons */
 aside *,
 nav *,
 [class*="sidebar"] *,
@@ -43,7 +51,6 @@ nav *,
   text-align: left !important;
 }
 
-/* Tab bar items stay left-aligned */
 [class*="WorkspaceTabs"] *,
 [class*="tab"] *,
 [class*="Tab"] * {
@@ -51,32 +58,20 @@ nav *,
 }
 
 /* ==========================================================================
-   CHAT CONVERSATION AREA: Targeted RTL & Readable Persian Formatting
+   PERSIAN CHAT MESSAGES & TEXT FORMATTING
    ========================================================================== */
 
-/* Typography inside chat messages */
-.chat-markdown,
-.chat-content-lane {
-  font-family: var(--deepai-rtl-font);
-}
-
-.chat-markdown p,
-.chat-markdown li,
-.chat-markdown blockquote {
-  line-height: 1.85 !important;
-}
-
-/* Persian Paragraphs inside Chat Messages */
-.chat-markdown p[dir="rtl"],
-.chat-markdown li[dir="rtl"],
-.chat-markdown blockquote[dir="rtl"],
-.chat-markdown h1[dir="rtl"],
-.chat-markdown h2[dir="rtl"],
-.chat-markdown h3[dir="rtl"],
-.chat-markdown h4[dir="rtl"],
-.chat-markdown h5[dir="rtl"],
-.chat-markdown h6[dir="rtl"],
-.chat-markdown .deepai-persian-block {
+/* Persian text paragraphs, list items, quotes, headings */
+.deepai-persian-text,
+p[dir="rtl"],
+li[dir="rtl"],
+blockquote[dir="rtl"],
+h1[dir="rtl"]:not(.text-center):not([aria-label*="What should we"]),
+h2[dir="rtl"],
+h3[dir="rtl"],
+h4[dir="rtl"],
+h5[dir="rtl"],
+h6[dir="rtl"] {
   direction: rtl !important;
   text-align: right !important;
   font-family: var(--deepai-rtl-font) !important;
@@ -84,33 +79,21 @@ nav *,
   unicode-bidi: isolate !important;
 }
 
-/* English / LTR Paragraphs inside Chat Messages */
-.chat-markdown p[dir="ltr"],
-.chat-markdown li[dir="ltr"],
-.chat-markdown blockquote[dir="ltr"] {
-  direction: ltr !important;
-  text-align: left !important;
-}
-
-/* Lists in Persian RTL */
-.chat-markdown ul[dir="rtl"],
-.chat-markdown ol[dir="rtl"],
-.chat-markdown .deepai-persian-block ul,
-.chat-markdown .deepai-persian-block ol {
+/* Persian Lists */
+ul:has(> li.deepai-persian-text),
+ol:has(> li.deepai-persian-text) {
   direction: rtl !important;
   padding-right: 1.5rem !important;
   padding-left: 0 !important;
-  margin-right: 0 !important;
 }
 
-.chat-markdown li[dir="rtl"] {
+li.deepai-persian-text {
   text-align: right !important;
   direction: rtl !important;
 }
 
-/* Blockquotes in Persian RTL */
-.chat-markdown blockquote[dir="rtl"],
-.chat-markdown .deepai-persian-block blockquote {
+/* Blockquotes in Persian */
+blockquote.deepai-persian-text {
   direction: rtl !important;
   text-align: right !important;
   border-right: 4px solid var(--accent, #6366f1) !important;
@@ -122,8 +105,8 @@ nav *,
 }
 
 /* Inline Code inside Persian text: strictly isolated LTR */
-.chat-markdown [dir="rtl"] code:not(pre code),
-.chat-markdown .deepai-persian-block code:not(pre code) {
+.deepai-persian-text code:not(pre code),
+[dir="rtl"] code:not(pre code) {
   direction: ltr !important;
   unicode-bidi: isolate !important;
   display: inline-block !important;
@@ -133,10 +116,17 @@ nav *,
   border-radius: 4px !important;
   vertical-align: baseline !important;
   font-size: 0.88em !important;
-  white-space: pre-wrap !important;
 }
 
-/* All Code Blocks, Monospace Views, Diffs, and Terminals stay strictly LTR */
+/* Latin words / phrases inside Persian text */
+.deepai-persian-text bdi,
+.deepai-persian-text .latin-isolate {
+  direction: ltr !important;
+  unicode-bidi: isolate !important;
+  display: inline !important;
+}
+
+/* Strictly keep all Code Blocks, Monospace Views, Diffs, and Terminals LTR */
 pre,
 pre *,
 code.block,
@@ -155,7 +145,7 @@ table * {
   unicode-bidi: isolate !important;
 }
 
-/* Prompt Input Textarea: adapt dynamically to Persian or English typing */
+/* Prompt Input Textarea */
 textarea[dir="rtl"],
 input[dir="rtl"],
 [contenteditable="true"][dir="rtl"] {
