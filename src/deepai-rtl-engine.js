@@ -1,44 +1,46 @@
 /**
  * DeepAI Code Persian & RTL Enhancer Engine
- * Injects bi-directional text fixes, Vazirmatn font, and automatic RTL detection.
+ * Targeted: Enhances chat message readability and Persian typography
+ * while strictly leaving the UI layout, sidebar, tabs, and navigation intact.
  */
 (function initDeepAIRTL() {
   if (window.__DEEPAI_RTL_INITIALIZED__) return;
   window.__DEEPAI_RTL_INITIALIZED__ = true;
 
-  // Regex matching Arabic/Persian/Hebrew characters
   const RTL_REGEX = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
   const STORAGE_KEY = 'deepai_rtl_enabled';
 
   let isEnabled = localStorage.getItem(STORAGE_KEY) !== 'false';
 
-  function applyRootClass() {
-    if (isEnabled) {
-      document.documentElement.classList.add('deepai-rtl-enabled');
-      document.body && document.body.classList.add('deepai-rtl-enabled');
-    } else {
-      document.documentElement.classList.remove('deepai-rtl-enabled');
-      document.body && document.body.classList.remove('deepai-rtl-enabled');
-    }
-    updateWidget();
-  }
-
-  // Determine if a string is primarily RTL or starts with RTL
   function isRTLText(text) {
     if (!text) return false;
     const trimmed = text.trim();
     if (!trimmed) return false;
-
-    // Check first 150 non-whitespace characters for early strong direction
-    const sample = trimmed.slice(0, 150);
-    return RTL_REGEX.test(sample);
+    return RTL_REGEX.test(trimmed);
   }
 
-  // Tag an element as RTL if it contains Persian/Arabic
+  // Process ONLY elements inside the chat conversation
   function processElement(el) {
     if (!el || el.nodeType !== Node.ELEMENT_NODE) return;
 
-    // Skip code blocks, preformatted text, diff viewers, and script/style tags
+    // Strictly skip sidebar, navigation, tabs, titlebar, modals, menus
+    if (
+      el.closest('aside') ||
+      el.closest('nav') ||
+      el.closest('[class*="sidebar"]') ||
+      el.closest('[class*="Sidebar"]') ||
+      el.closest('[class*="WorkspaceTabs"]') ||
+      el.closest('[class*="tab"]') ||
+      el.closest('[class*="Tab"]') ||
+      el.closest('[class*="header"]') ||
+      el.closest('[class*="Header"]') ||
+      el.closest('[class*="titlebar"]') ||
+      el.closest('[class*="project"]')
+    ) {
+      return;
+    }
+
+    // Skip code blocks, pre tags, and terminals
     const tag = el.tagName.toLowerCase();
     if (
       tag === 'pre' ||
@@ -58,40 +60,46 @@
       return;
     }
 
-    // Check relevant content elements
-    const isCandidateTag = ['p', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'span', 'div'].includes(tag);
-    if (!isCandidateTag) return;
+    // Only process text elements inside chat messages (.chat-markdown or message rows)
+    const isInsideChat = el.closest('.chat-markdown') || el.closest('.chat-content-lane') || el.closest('.messages-timeline-row-frame');
+    if (!isInsideChat) return;
 
-    // Only process elements that contain direct text or are leaf-like text wrappers
+    const isTextTag = ['p', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote'].includes(tag);
+    if (!isTextTag) return;
+
     const text = el.innerText || el.textContent || '';
-    if (!text || text.length < 2) return;
+    if (!text || text.trim().length === 0) return;
 
     if (isRTLText(text)) {
-      if (!el.classList.contains('deepai-rtl-block')) {
-        el.classList.add('deepai-rtl-block');
+      if (el.getAttribute('dir') !== 'rtl') {
         el.setAttribute('dir', 'rtl');
+        el.classList.add('deepai-persian-block');
       }
     } else {
-      if (el.classList.contains('deepai-rtl-block')) {
-        el.classList.remove('deepai-rtl-block');
+      if (el.getAttribute('dir') === 'rtl') {
         el.removeAttribute('dir');
+        el.classList.remove('deepai-persian-block');
       }
     }
   }
 
-  // Scan a DOM subtree for text elements
-  function scanNode(node) {
-    if (!isEnabled) return;
-    if (!node || node.nodeType !== Node.ELEMENT_NODE) return;
+  function scanNode(root) {
+    if (!isEnabled || !root) return;
+    if (root.nodeType !== Node.ELEMENT_NODE) return;
 
-    processElement(node);
-    const children = node.querySelectorAll ? node.querySelectorAll('p, li, h1, h2, h3, h4, h5, h6, blockquote, div') : [];
-    for (let i = 0; i < children.length; i++) {
-      processElement(children[i]);
+    const chatContainers = root.matches && (root.matches('.chat-markdown, .chat-content-lane, .messages-timeline-row-frame'))
+      ? [root]
+      : (root.querySelectorAll ? root.querySelectorAll('.chat-markdown, .chat-content-lane, .messages-timeline-row-frame') : []);
+
+    for (let c = 0; c < chatContainers.length; c++) {
+      const items = chatContainers[c].querySelectorAll('p, li, h1, h2, h3, h4, h5, h6, blockquote');
+      for (let i = 0; i < items.length; i++) {
+        processElement(items[i]);
+      }
     }
   }
 
-  // Setup MutationObserver for streaming AI responses and dynamic DOM changes
+  // MutationObserver with debounce for real-time AI streaming
   let scheduled = false;
   const nodesToProcess = new Set();
 
@@ -127,7 +135,7 @@
     }
   });
 
-  // Handle Input / Textarea typing
+  // Handle Input / Textarea typing in Prompt Composer
   function handleInputEvent(e) {
     const el = e.target;
     if (!el || (el.tagName !== 'TEXTAREA' && el.tagName !== 'INPUT' && !el.isContentEditable)) return;
@@ -139,12 +147,10 @@
       return;
     }
 
-    if (RTL_REGEX.test(trimmed[0]) || RTL_REGEX.test(trimmed.slice(0, 30))) {
+    if (RTL_REGEX.test(trimmed)) {
       el.setAttribute('dir', 'rtl');
-      el.classList.add('deepai-rtl-input');
     } else {
       el.setAttribute('dir', 'ltr');
-      el.classList.remove('deepai-rtl-input');
     }
   }
 
@@ -154,8 +160,8 @@
     if (widget || !document.body) return;
     widget = document.createElement('div');
     widget.id = 'deepai-rtl-toggle-widget';
-    widget.title = 'تغییر وضعیت RTL و فونت فارسی (Ctrl+Shift+R)';
-    widget.innerHTML = `<span class="indicator-dot"></span><span class="widget-label">RTL فارسی</span>`;
+    widget.title = 'تغییر وضعیت فونت و راست‌چین فارسی (Ctrl+Shift+R)';
+    widget.innerHTML = `<span class="indicator-dot"></span><span class="widget-label">RTL متن</span>`;
 
     widget.addEventListener('click', () => {
       toggleRTL();
@@ -170,29 +176,29 @@
     if (isEnabled) {
       widget.classList.add('rtl-active');
       widget.classList.remove('rtl-disabled');
-      widget.querySelector('.widget-label').textContent = 'RTL فعال';
+      widget.querySelector('.widget-label').textContent = 'RTL متن فعال';
     } else {
       widget.classList.remove('rtl-active');
       widget.classList.add('rtl-disabled');
-      widget.querySelector('.widget-label').textContent = 'RTL غیرفعال';
+      widget.querySelector('.widget-label').textContent = 'RTL متن غیرفعال';
     }
   }
 
   function toggleRTL(state) {
     isEnabled = typeof state === 'boolean' ? state : !isEnabled;
     localStorage.setItem(STORAGE_KEY, isEnabled ? 'true' : 'false');
-    applyRootClass();
+    updateWidget();
     if (isEnabled) {
       scanNode(document.body);
     } else {
-      document.querySelectorAll('.deepai-rtl-block').forEach((el) => {
-        el.classList.remove('deepai-rtl-block');
+      document.querySelectorAll('.deepai-persian-block').forEach((el) => {
+        el.classList.remove('deepai-persian-block');
         el.removeAttribute('dir');
       });
     }
   }
 
-  // Setup Keyboard Shortcut: Ctrl + Shift + R
+  // Hotkey: Ctrl + Shift + R
   window.addEventListener('keydown', (e) => {
     if (e.ctrlKey && e.shiftKey && (e.key === 'R' || e.key === 'r')) {
       e.preventDefault();
@@ -200,13 +206,9 @@
     }
   });
 
-  // Attach input listeners
   document.addEventListener('input', handleInputEvent, true);
-  document.addEventListener('keyup', handleInputEvent, true);
 
-  // Initialize
   function boot() {
-    applyRootClass();
     createWidget();
     if (document.body) {
       scanNode(document.body);

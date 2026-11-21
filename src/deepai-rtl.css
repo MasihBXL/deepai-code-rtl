@@ -1,4 +1,4 @@
-/* DeepAI Code Persian & RTL Support Styles */
+/* DeepAI Code Persian & RTL Support Styles - Targeted & Non-Intrusive */
 @import url('https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css');
 
 :root {
@@ -6,60 +6,111 @@
   --deepai-mono-font: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
 
-/* Enable RTL styling when deepai-rtl-enabled class is on root/body */
-html.deepai-rtl-enabled,
-body.deepai-rtl-enabled {
-  /* Default fallbacks */
+/* Apply Vazirmatn font for beautiful Persian typography without changing layout */
+body, input, textarea, button {
+  font-family: var(--deepai-rtl-font);
 }
 
-/* RTL Text Blocks (Detected paragraphs, headings, list items, etc.) */
-.deepai-rtl-block,
-[dir="rtl"]:not(pre):not(code):not(pre *) {
-  direction: rtl !important;
-  text-align: right !important;
-  font-family: var(--deepai-rtl-font) !important;
-  line-height: 1.8 !important;
-  unicode-bidi: plaintext !important;
+/* ==========================================================================
+   STRICT PROTECTION: Sidebar, Tabs, Titlebar, and UI Layout MUST REMAIN LTR
+   ========================================================================== */
+aside,
+nav,
+[class*="sidebar"],
+[class*="Sidebar"],
+[class*="WorkspaceTabs"],
+[class*="tabs"],
+[class*="Tabs"],
+[class*="header"],
+[class*="Header"],
+[class*="titlebar"],
+[class*="Titlebar"],
+[class*="project"],
+[class*="Project"],
+[class*="dialog"],
+[class*="Dialog"],
+[class*="menu"],
+[class*="Menu"] {
+  direction: ltr !important;
+  text-align: left !important;
 }
 
-/* Headings in RTL */
-.deepai-rtl-block h1,
-.deepai-rtl-block h2,
-.deepai-rtl-block h3,
-.deepai-rtl-block h4,
-.deepai-rtl-block h5,
-.deepai-rtl-block h6 {
-  font-family: var(--deepai-rtl-font) !important;
-  font-weight: 700 !important;
-  text-align: right !important;
-  direction: rtl !important;
+/* Sidebar chat titles and list items: always stay left-aligned next to their icons */
+aside *,
+nav *,
+[class*="sidebar"] *,
+[class*="Sidebar"] * {
+  text-align: left !important;
 }
 
-/* Paragraphs & Text */
-.deepai-rtl-block p {
-  text-align: right !important;
-  direction: rtl !important;
-  margin-bottom: 0.75rem;
+/* Tab bar items stay left-aligned */
+[class*="WorkspaceTabs"] *,
+[class*="tab"] *,
+[class*="Tab"] * {
+  text-align: left !important;
+}
+
+/* ==========================================================================
+   CHAT CONVERSATION AREA: Targeted RTL & Readable Persian Formatting
+   ========================================================================== */
+
+/* Typography inside chat messages */
+.chat-markdown,
+.chat-content-lane {
+  font-family: var(--deepai-rtl-font);
+}
+
+.chat-markdown p,
+.chat-markdown li,
+.chat-markdown blockquote {
   line-height: 1.85 !important;
 }
 
-/* Lists in RTL */
-.deepai-rtl-block ul,
-.deepai-rtl-block ol {
+/* Persian Paragraphs inside Chat Messages */
+.chat-markdown p[dir="rtl"],
+.chat-markdown li[dir="rtl"],
+.chat-markdown blockquote[dir="rtl"],
+.chat-markdown h1[dir="rtl"],
+.chat-markdown h2[dir="rtl"],
+.chat-markdown h3[dir="rtl"],
+.chat-markdown h4[dir="rtl"],
+.chat-markdown h5[dir="rtl"],
+.chat-markdown h6[dir="rtl"],
+.chat-markdown .deepai-persian-block {
+  direction: rtl !important;
+  text-align: right !important;
+  font-family: var(--deepai-rtl-font) !important;
+  line-height: 1.85 !important;
+  unicode-bidi: isolate !important;
+}
+
+/* English / LTR Paragraphs inside Chat Messages */
+.chat-markdown p[dir="ltr"],
+.chat-markdown li[dir="ltr"],
+.chat-markdown blockquote[dir="ltr"] {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+/* Lists in Persian RTL */
+.chat-markdown ul[dir="rtl"],
+.chat-markdown ol[dir="rtl"],
+.chat-markdown .deepai-persian-block ul,
+.chat-markdown .deepai-persian-block ol {
   direction: rtl !important;
   padding-right: 1.5rem !important;
   padding-left: 0 !important;
   margin-right: 0 !important;
 }
 
-.deepai-rtl-block li {
+.chat-markdown li[dir="rtl"] {
   text-align: right !important;
   direction: rtl !important;
-  line-height: 1.8 !important;
 }
 
-/* Blockquotes in RTL */
-.deepai-rtl-block blockquote {
+/* Blockquotes in Persian RTL */
+.chat-markdown blockquote[dir="rtl"],
+.chat-markdown .deepai-persian-block blockquote {
   direction: rtl !important;
   text-align: right !important;
   border-right: 4px solid var(--accent, #6366f1) !important;
@@ -70,12 +121,12 @@ body.deepai-rtl-enabled {
   margin-left: 0 !important;
 }
 
-/* Crucial: Inline code inside RTL text */
-.deepai-rtl-block code:not(pre code),
-[dir="rtl"] code:not(pre code) {
+/* Inline Code inside Persian text: strictly isolated LTR */
+.chat-markdown [dir="rtl"] code:not(pre code),
+.chat-markdown .deepai-persian-block code:not(pre code) {
   direction: ltr !important;
   unicode-bidi: isolate !important;
-  display: inline !important;
+  display: inline-block !important;
   font-family: var(--deepai-mono-font) !important;
   padding: 0.15em 0.4em !important;
   margin: 0 0.25em !important;
@@ -83,17 +134,9 @@ body.deepai-rtl-enabled {
   vertical-align: baseline !important;
   font-size: 0.88em !important;
   white-space: pre-wrap !important;
-  word-break: break-word !important;
 }
 
-/* Isolated English / Latin chunks in RTL text */
-.deepai-rtl-block span.deepai-latin-chunk,
-.deepai-rtl-block bdi {
-  direction: ltr !important;
-  unicode-bidi: isolate !important;
-}
-
-/* CRITICAL: Keep all Code Blocks, Monospace Views, Diff & Terminals strictly LTR */
+/* All Code Blocks, Monospace Views, Diffs, and Terminals stay strictly LTR */
 pre,
 pre *,
 code.block,
@@ -112,7 +155,7 @@ table * {
   unicode-bidi: isolate !important;
 }
 
-/* Prompt Input & Textarea */
+/* Prompt Input Textarea: adapt dynamically to Persian or English typing */
 textarea[dir="rtl"],
 input[dir="rtl"],
 [contenteditable="true"][dir="rtl"] {
@@ -122,54 +165,52 @@ input[dir="rtl"],
   line-height: 1.7 !important;
 }
 
-/* Composer placeholder text alignment */
 textarea[dir="rtl"]::placeholder,
 input[dir="rtl"]::placeholder {
   text-align: right !important;
   direction: rtl !important;
-  font-family: var(--deepai-rtl-font) !important;
 }
 
-/* Floating RTL Control Widget */
+/* Floating Status / Toggle Widget */
 #deepai-rtl-toggle-widget {
   position: fixed;
-  bottom: 18px;
-  right: 18px;
+  bottom: 16px;
+  right: 16px;
   z-index: 999999;
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
-  border-radius: 20px;
-  background: rgba(30, 30, 35, 0.85);
+  padding: 5px 10px;
+  border-radius: 16px;
+  background: rgba(25, 25, 30, 0.85);
   backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #fff;
+  color: #e2e8f0;
   font-family: var(--deepai-rtl-font);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   cursor: pointer;
   user-select: none;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  opacity: 0.7;
+  transition: all 0.2s ease;
+  opacity: 0.6;
 }
 
 #deepai-rtl-toggle-widget:hover {
   opacity: 1;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45);
+  transform: translateY(-1px);
   border-color: rgba(99, 102, 241, 0.5);
 }
 
 #deepai-rtl-toggle-widget.rtl-active {
-  background: rgba(79, 70, 229, 0.85);
+  background: rgba(79, 70, 229, 0.8);
   border-color: rgba(129, 140, 248, 0.6);
+  color: #fff;
 }
 
 #deepai-rtl-toggle-widget .indicator-dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: #10b981;
   display: inline-block;
