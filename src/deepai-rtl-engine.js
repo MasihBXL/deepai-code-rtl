@@ -1,6 +1,6 @@
 /**
  * DeepAI Code Persian & RTL Enhancer Engine
- * Precision targeted: Formats chat conversation text and center-aligns hero heading,
+ * Targeted: Formats chat conversation text and center-aligns hero heading,
  * while strictly leaving the UI layout, sidebar, tabs, and navigation intact.
  */
 (function initDeepAIRTL() {
@@ -30,30 +30,7 @@
         h.style.setProperty('width', '100%', 'important');
         h.style.setProperty('margin-left', 'auto', 'important');
         h.style.setProperty('margin-right', 'auto', 'important');
-        if (h.parentElement) {
-          h.parentElement.style.setProperty('text-align', 'center', 'important');
-          h.parentElement.style.setProperty('align-items', 'center', 'important');
-          h.parentElement.style.setProperty('justify-content', 'center', 'important');
-        }
-      }
-    }
-  }
-
-  // Fix neutral punctuation (periods, question marks, exclamation marks) attached to English words inside Persian text
-  function fixBidiPunctuation(el) {
-    if (!el || el.__bidiFixed) return;
-    el.__bidiFixed = true;
-
-    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null, false);
-    let textNode;
-    while ((textNode = walker.nextNode())) {
-      const val = textNode.nodeValue;
-      if (!val) continue;
-
-      // When an English sentence ends with a period/exclamation mark before Persian text:
-      // Append an invisible Left-to-Right Mark (\u200E) so the period stays with the English sentence
-      if (/[a-zA-Z0-9][.!?][\s\n]+[\u0600-\u06FF]/.test(val)) {
-        textNode.nodeValue = val.replace(/([a-zA-Z0-9][.!?])([\s\n]+[\u0600-\u06FF])/g, '$1\u200E$2');
+        h.style.setProperty('display', 'block', 'important');
       }
     }
   }
@@ -65,8 +42,7 @@
       el.closest('nav') ||
       el.closest('[class*="sidebar"]') ||
       el.closest('[class*="Sidebar"]') ||
-      el.closest('[class*="WorkspaceTabs"]') ||
-      el.closest('button')
+      el.closest('[class*="WorkspaceTabs"]')
     );
   }
 
@@ -103,26 +79,34 @@
     if (!text || text.trim().length === 0) return;
 
     if (isRTLText(text)) {
-      if (el.getAttribute('dir') !== 'rtl') {
-        el.setAttribute('dir', 'rtl');
-        el.classList.add('deepai-persian-text');
-        fixBidiPunctuation(el);
+      el.setAttribute('dir', 'rtl');
+      el.classList.add('deepai-persian');
+      if (tag === 'li' && el.parentElement) {
+        el.parentElement.classList.add('deepai-persian');
+        el.parentElement.setAttribute('dir', 'rtl');
       }
     } else {
-      if (el.getAttribute('dir') === 'rtl') {
-        el.removeAttribute('dir');
-        el.classList.remove('deepai-persian-text');
-      }
+      el.removeAttribute('dir');
+      el.classList.remove('deepai-persian');
     }
   }
 
   function scanNode(root) {
-    if (!isEnabled || !root) return;
     centerHeroTitle();
+    if (!root) return;
+
+    if (!isEnabled) {
+      const tagged = (root.querySelectorAll ? root.querySelectorAll('.deepai-persian') : []);
+      for (let i = 0; i < tagged.length; i++) {
+        tagged[i].classList.remove('deepai-persian');
+        tagged[i].removeAttribute('dir');
+      }
+      return;
+    }
 
     if (root.nodeType === Node.ELEMENT_NODE) {
       processElement(root);
-      const items = root.querySelectorAll('p, li, blockquote, h2, h3, h4, h5, h6');
+      const items = root.querySelectorAll ? root.querySelectorAll('p, li, blockquote, h2, h3, h4, h5, h6') : [];
       for (let i = 0; i < items.length; i++) {
         processElement(items[i]);
       }
@@ -131,38 +115,13 @@
 
   // MutationObserver for real-time streaming AI responses
   let scheduled = false;
-  const nodesToProcess = new Set();
-
-  function flushNodes() {
-    scheduled = false;
-    if (!isEnabled) {
-      nodesToProcess.clear();
-      return;
-    }
-    nodesToProcess.forEach((node) => {
-      scanNode(node);
-    });
-    nodesToProcess.clear();
-    centerHeroTitle();
-  }
-
-  const observer = new MutationObserver((mutations) => {
-    if (!isEnabled) return;
-    for (const mutation of mutations) {
-      if (mutation.type === 'childList') {
-        for (const added of mutation.addedNodes) {
-          if (added.nodeType === Node.ELEMENT_NODE) {
-            nodesToProcess.add(added);
-          }
-        }
-      } else if (mutation.type === 'characterData') {
-        const parent = mutation.target.parentElement;
-        if (parent) nodesToProcess.add(parent);
-      }
-    }
-    if (!scheduled && nodesToProcess.size > 0) {
+  const observer = new MutationObserver(() => {
+    if (!scheduled) {
       scheduled = true;
-      requestAnimationFrame(flushNodes);
+      requestAnimationFrame(() => {
+        scheduled = false;
+        scanNode(document.body);
+      });
     }
   });
 
@@ -219,15 +178,7 @@
     isEnabled = typeof state === 'boolean' ? state : !isEnabled;
     localStorage.setItem(STORAGE_KEY, isEnabled ? 'true' : 'false');
     updateWidget();
-    if (isEnabled) {
-      scanNode(document.body);
-    } else {
-      document.querySelectorAll('.deepai-persian-text').forEach((el) => {
-        el.classList.remove('deepai-persian-text');
-        el.removeAttribute('dir');
-        el.__bidiFixed = false;
-      });
-    }
+    scanNode(document.body);
   }
 
   // Hotkey: Ctrl + Shift + R
