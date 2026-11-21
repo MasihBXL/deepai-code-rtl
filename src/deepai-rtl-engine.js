@@ -58,28 +58,23 @@
     }
   }
 
-  // Process text elements
-  function processElement(el) {
-    if (!el || el.nodeType !== Node.ELEMENT_NODE) return;
-
-    // Strictly skip sidebar, navigation, tabs, titlebars, and menus
-    if (
+  function isSidebarOrTab(el) {
+    if (!el) return false;
+    return !!(
       el.closest('aside') ||
       el.closest('nav') ||
       el.closest('[class*="sidebar"]') ||
       el.closest('[class*="Sidebar"]') ||
       el.closest('[class*="WorkspaceTabs"]') ||
-      el.closest('[class*="tab"]') ||
-      el.closest('[class*="Tab"]') ||
-      el.closest('[class*="header"]') ||
-      el.closest('[class*="Header"]') ||
-      el.closest('[class*="titlebar"]') ||
-      el.closest('[class*="Titlebar"]') ||
-      el.closest('[class*="project"]') ||
       el.closest('button')
-    ) {
-      return;
-    }
+    );
+  }
+
+  // Process text elements
+  function processElement(el) {
+    if (!el || el.nodeType !== Node.ELEMENT_NODE) return;
+
+    if (isSidebarOrTab(el)) return;
 
     // Skip code blocks, pre tags, diffs, terminals, tables
     const tag = el.tagName.toLowerCase();
@@ -101,13 +96,8 @@
       return;
     }
 
-    const isTextTag = ['p', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote'].includes(tag);
+    const isTextTag = ['p', 'li', 'blockquote', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(tag);
     if (!isTextTag) return;
-
-    // Don't format the hero title as RTL
-    if (tag === 'h1' && (el.textContent || '').includes('What should we')) {
-      return;
-    }
 
     const text = el.innerText || el.textContent || '';
     if (!text || text.trim().length === 0) return;
@@ -132,7 +122,7 @@
 
     if (root.nodeType === Node.ELEMENT_NODE) {
       processElement(root);
-      const items = root.querySelectorAll('p, li, h1, h2, h3, h4, h5, h6, blockquote');
+      const items = root.querySelectorAll('p, li, blockquote, h2, h3, h4, h5, h6');
       for (let i = 0; i < items.length; i++) {
         processElement(items[i]);
       }
@@ -235,6 +225,7 @@
       document.querySelectorAll('.deepai-persian-text').forEach((el) => {
         el.classList.remove('deepai-persian-text');
         el.removeAttribute('dir');
+        el.__bidiFixed = false;
       });
     }
   }

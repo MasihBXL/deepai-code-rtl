@@ -9,8 +9,9 @@
 /* ==========================================================================
    CENTER HERO HEADING ("What should we work on?")
    ========================================================================== */
-h1[aria-label*="What should we"],
-div:has(> h1[aria-label*="What should we"]),
+h1,
+h1.text-center,
+[aria-label*="What should we"],
 div.mx-auto.flex.w-full.max-w-5xl,
 div.mx-auto.flex.w-full.max-w-5xl > h1,
 div.mx-auto.flex.w-full.max-w-5xl > p {
@@ -27,19 +28,13 @@ div.mx-auto.flex.w-full.max-w-5xl > h1 {
 }
 
 /* ==========================================================================
-   STRICT PROTECTION: Keep Sidebar, Tabs, Titlebar strictly LTR and Left-Aligned
+   STRICT SIDEBAR & TABS PROTECTION: Keep standard LTR layout
    ========================================================================== */
 aside,
 nav,
 [class*="sidebar"],
 [class*="Sidebar"],
-[class*="WorkspaceTabs"],
-[class*="tabs"],
-[class*="Tabs"],
-[class*="titlebar"],
-[class*="Titlebar"],
-[class*="menu"],
-[class*="Menu"] {
+[class*="WorkspaceTabs"] {
   direction: ltr !important;
   text-align: left !important;
 }
@@ -51,9 +46,7 @@ nav *,
   text-align: left !important;
 }
 
-[class*="WorkspaceTabs"] *,
-[class*="tab"] *,
-[class*="Tab"] * {
+[class*="WorkspaceTabs"] * {
   text-align: left !important;
 }
 
@@ -61,12 +54,11 @@ nav *,
    PERSIAN CHAT MESSAGES & TEXT FORMATTING
    ========================================================================== */
 
-/* Persian text paragraphs, list items, quotes, headings */
+/* Persian text elements */
 .deepai-persian-text,
 p[dir="rtl"],
 li[dir="rtl"],
 blockquote[dir="rtl"],
-h1[dir="rtl"]:not(.text-center):not([aria-label*="What should we"]),
 h2[dir="rtl"],
 h3[dir="rtl"],
 h4[dir="rtl"],
@@ -79,7 +71,7 @@ h6[dir="rtl"] {
   unicode-bidi: isolate !important;
 }
 
-/* Persian Lists */
+/* Lists */
 ul:has(> li.deepai-persian-text),
 ol:has(> li.deepai-persian-text) {
   direction: rtl !important;
@@ -92,7 +84,7 @@ li.deepai-persian-text {
   direction: rtl !important;
 }
 
-/* Blockquotes in Persian */
+/* Blockquotes */
 blockquote.deepai-persian-text {
   direction: rtl !important;
   text-align: right !important;
@@ -105,8 +97,8 @@ blockquote.deepai-persian-text {
 }
 
 /* Inline Code inside Persian text: strictly isolated LTR */
-.deepai-persian-text code:not(pre code),
-[dir="rtl"] code:not(pre code) {
+.deepai-persian-text code,
+[dir="rtl"] code {
   direction: ltr !important;
   unicode-bidi: isolate !important;
   display: inline-block !important;
@@ -118,15 +110,7 @@ blockquote.deepai-persian-text {
   font-size: 0.88em !important;
 }
 
-/* Latin words / phrases inside Persian text */
-.deepai-persian-text bdi,
-.deepai-persian-text .latin-isolate {
-  direction: ltr !important;
-  unicode-bidi: isolate !important;
-  display: inline !important;
-}
-
-/* Strictly keep all Code Blocks, Monospace Views, Diffs, and Terminals LTR */
+/* All Code Blocks, Monospace Views, Diffs, and Terminals stay strictly LTR */
 pre,
 pre *,
 code.block,
