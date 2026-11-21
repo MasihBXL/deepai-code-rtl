@@ -1,0 +1,8 @@
+node_modules/
+*.log
+*.bak
+*.new
+temp_patch_*
+temp_app/
+.DS_Store
+Thumbs.db

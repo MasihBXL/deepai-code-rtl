@@ -1,0 +1,32 @@
+{
+  "name": "deepai-code-rtl",
+  "version": "1.0.0",
+  "description": "Persian & RTL Enhancer for DeepAI Code desktop agent with mixed-text bi-directional isolation and Vazirmatn typography.",
+  "main": "src/patcher.js",
+  "bin": {
+    "deepai-code-rtl": "./bin/cli.js"
+  },
+  "scripts": {
+    "patch": "node src/patcher.js patch",
+    "restore": "node src/patcher.js restore",
+    "status": "node src/patcher.js status",
+    "start": "node src/patcher.js patch"
+  },
+  "keywords": [
+    "deepai",
+    "deepaicode",
+    "deepai-code",
+    "rtl",
+    "persian",
+    "farsi",
+    "bidi",
+    "vazirmatn",
+    "patcher",
+    "electron"
+  ],
+  "author": "MasihBXL",
+  "license": "MIT",
+  "dependencies": {
+    "@electron/asar": "^3.2.14"
+  }
+}

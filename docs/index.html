@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>پروژه افزودن پشتیبانی RTL و زبان فارسی به DeepAI Code</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --success: #10b981;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Vazirmatn', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.8;
+      direction: rtl;
+    }
+    header {
+      padding: 3rem 1.5rem;
+      text-align: center;
+      background: linear-gradient(180deg, rgba(99,102,241,0.15) 0%, rgba(15,23,42,0) 100%);
+      border-bottom: 1px solid var(--border);
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 1rem;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(99,102,241,0.2);
+      color: #818cf8;
+      padding: 0.35rem 0.9rem;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      border: 1px solid rgba(99,102,241,0.3);
+    }
+    p.lead {
+      font-size: 1.15rem;
+      color: var(--text-muted);
+      max-width: 700px;
+      margin: 0 auto 2rem;
+    }
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.75rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2);
+    }
+    h2 {
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+      color: #e2e8f0;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+    }
+    ul {
+      padding-right: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    li {
+      margin-bottom: 0.5rem;
+      color: #cbd5e1;
+    }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      direction: ltr;
+      display: inline-block;
+      unicode-bidi: isolate;
+      background: #090d16;
+      padding: 0.2rem 0.5rem;
+      border-radius: 6px;
+      color: #38bdf8;
+      font-size: 0.9rem;
+    }
+    pre {
+      background: #090d16;
+      padding: 1rem;
+      border-radius: 8px;
+      direction: ltr;
+      text-align: left;
+      overflow-x: auto;
+      border: 1px solid #1e293b;
+      margin: 1rem 0;
+    }
+    pre code {
+      background: transparent;
+      padding: 0;
+      color: #e2e8f0;
+    }
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+    @media (max-width: 768px) {
+      .comparison-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .comparison-box {
+      background: #0b1120;
+      border-radius: 8px;
+      padding: 1rem;
+      border: 1px solid var(--border);
+    }
+    .comparison-box.bad {
+      border-color: rgba(239, 68, 68, 0.4);
+    }
+    .comparison-box.good {
+      border-color: rgba(16, 185, 129, 0.4);
+    }
+    .tag {
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 0.5rem;
+    }
+    .tag.red { background: rgba(239, 68, 68, 0.2); color: #f87171; }
+    .tag.green { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="badge">پشتیبانی کامل از متن دوزبانه و فونت وزیرمتن</div>
+    <h1>افزودن قابلیت راست‌چین (RTL) به برنامه DeepAI Code</h1>
+    <p class="lead">
+      حل مشکل به‌هم‌ریختگی متن‌های ترکیبی فارسی و انگلیسی، جداسازی هوشمند کدها، و نمایش روان پیام‌ها در اپلیکیشن دسکتاپ DeepAI Code.
+    </p>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <h2>مشکلاتی که این پچ برطرف می‌کند</h2>
+      <ul>
+        <li><strong>ترکیب متن فارسی و انگلیسی:</strong> رفع مشکل پرش علائم نگارشی (مانند نقطه، پرانتز و علامت سوال) به ابتدای خط هنگام نوشتن کلمات انگلیسی در جملات فارسی.</li>
+        <li><strong>جداسازی کدهای درون‌خطی (Inline Code):</strong> واژه‌ها و متغیرهای انگلیسی درون <code>code</code> با حفظ جهت چپ‌به‌راست و ایزولاسیون کامل نمایش داده می‌شوند.</li>
+        <li><strong>حفظ ساختار بلوک‌های کد:</strong> تمامی کدهای چندخطی، پنجره‌های Diff، خروجی‌های ترمینال و جداول با جهت LTR باقی می‌مانند.</li>
+        <li><strong>فونت استاندارد وزیرمتن (Vazirmatn):</strong> اعمال فونت زیبای فارسی با فاصله خطوط (line-height) بهینه‌شده برای مطالعه راحت.</li>
+        <li><strong>تشخیص خودکار متن ورودی:</strong> هماهنگی کامل هنگام تایپ در کادر پرامپت (تغییر جهت خودکار هنگام تایپ فارسی یا انگلیسی).</li>
+      </ul>
+    </section>
+
+    <section class="card">
+      <h2>مقایسه قبل و بعد از اعمال پچ</h2>
+      <div class="comparison-grid">
+        <div class="comparison-box bad">
+          <span class="tag red">قبل از پچ (پیش‌فرض LTR)</span>
+          <div style="direction: ltr; text-align: left; font-size: 0.92rem; color: #94a3b8;">
+            برای نصب پکیج دستور npm install را در ترمینال بزنید و سپس فایل config.json را ویرایش کنید.
+          </div>
+        </div>
+        <div class="comparison-box good">
+          <span class="tag green">بعد از پچ (RTL با ایزولاسیون)</span>
+          <div style="direction: rtl; text-align: right; font-size: 0.92rem; color: #f8fafc;">
+            برای نصب پکیج دستور <code style="unicode-bidi: isolate; direction: ltr;">npm install</code> را در ترمینال بزنید و سپس فایل <code style="unicode-bidi: isolate; direction: ltr;">config.json</code> را ویرایش کنید.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>نحوه نصب و استفاده</h2>
+      <p>۱. ریپازیتوری را کلون کرده یا با دستور زیر پچ را اعمال کنید:</p>
+      <pre><code># اجرای مستقیم پچ
+node src/patcher.js patch
+
+# یا با اجرای فایل scripts/apply-patch.bat</code></pre>
+
+      <p>۲. کلید میانبر فعال/غیرفعال‌سازی:</p>
+      <p>در هر زمان داخل محیط برنامه می‌توانید با فشردن کلیدهای <code>Ctrl + Shift + R</code> یا کلیک بر روی ویجت گوشه صفحه، جهت متن را تغییر دهید.</p>
+
+      <p style="margin-top: 1rem;">۳. بازگردانی به نسخه اصلی بدون پچ:</p>
+      <pre><code>node src/patcher.js restore</code></pre>
+    </section>
+  </main>
+
+  <footer>
+    <p>توسعه‌داده‌شده برای کاربران فارسی‌زبان DeepAI Code | MasihBXL</p>
+  </footer>
+</body>
+</html>
